@@ -40,4 +40,3 @@ bash scripts/probar.sh
 3. Abre la pestaña **Actions** para consultar “Liberar y desplegar horarios”. Los pull requests a `main` solo preparan y prueban; los push a `main` también publican si todo pasa.
 4. Cuando termine un despliegue exitoso, la URL real aparece en el resumen del trabajo “Publicar en GitHub Pages” y en **Settings > Pages**.
 
-No se incluyen credenciales. Consulta [el documento de entrega](docs/manejo-de-scripts.md) para la evidencia y parámetros.

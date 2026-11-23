@@ -20,15 +20,15 @@ El destino de publicación es el entorno protegido `github-pages`. La publicaci�
 
 Los siguientes valores son metas propuestas para un caso académico, no resultados medidos. La disponibilidad mensual objetivo es de 99 %. Se comprobaría con una sonda HTTP externa que registre respuestas exitosas frente al total de mediciones; la fórmula sería `(mediciones correctas / mediciones totales) × 100`.
 
-La segunda meta es que un cambio integrado en `main` sea visible en un máximo de 10 minutos. Se mediría restando la hora del `push` integrado de la hora en que el trabajo de Pages informa la URL o una sonda externa observa el cambio. Si no hay una ejecución remota ni una sonda, no se reporta un valor como medido.
+La segunda meta es que un cambio integrado en `main` sea visible en un máximo de 10 minutos. Se mediría restando la hora del `push` integrado de la hora en que el trabajo de Pages informa la URL o una sonda externa observa el cambio. Aunque ya existe una ejecución remota exitosa, no se reporta un tiempo medido mientras no se registren ambos momentos para ese cálculo.
 
 ## 4. Métricas para el monitoreo de la aplicación
 
 | Métrica | Forma de cálculo | Fuente de datos | Frecuencia | Estado actual |
 | --- | --- | --- | --- | --- |
-| Disponibilidad del sitio | `(HTTP 2xx / solicitudes totales) × 100` | Sonda HTTP externa y registros de GitHub Pages | Cada 5 minutos; resumen mensual | Pendiente: todavía no hay URL publicada. |
-| Éxito del pipeline | `(ejecuciones exitosas / ejecuciones totales) × 100` | Pestaña Actions, flujo “Liberar y desplegar horarios” | Por ejecución y resumen mensual | Pendiente: no se ha ejecutado en GitHub Actions. |
-| Duración de liberación | Hora final de despliegue − hora del push a `main` | Tiempos del workflow y del despliegue | Cada integración | Pendiente: no existe despliegue remoto. |
+| Disponibilidad del sitio | `(HTTP 2xx / solicitudes totales) × 100` | Sonda HTTP externa y registros de GitHub Pages | Cada 5 minutos; resumen mensual | Sitio publicado; disponibilidad mensual aún sin medir. |
+| Éxito del pipeline | `(ejecuciones exitosas / ejecuciones totales) × 100` | [Ejecución #2, intento 2 de GitHub Actions](https://github.com/davi8d280303/manejo-de-scripts/actions/runs/45101791254/attempts/2) | Por ejecución y resumen mensual | Observado: la ejecución #2, intento 2, terminó correctamente. No se calcula un porcentaje con una sola evidencia registrada. |
+| Duración de liberación | Hora final de despliegue − hora del push a `main` | Tiempos del workflow y del despliegue | Cada integración | Despliegue remoto observado en la ejecución #2, intento 2; tiempo total aún sin medir. |
 | Resultado local de preparación | Código de salida de `bash scripts/preparar.sh` | Consola local | Antes de entregar | Medido: correcto en esta sesión; creó `dist/index.html` y `dist/assets/styles.css`. |
 | Resultado local de prueba HTTP | Código de salida de `bash scripts/probar.sh` | Consola local | Antes de entregar | Medido: caso exitoso con código `0`; caso sin CSS con código `1` esperado. |
 
@@ -53,12 +53,12 @@ La disponibilidad del sitio y el resultado del pipeline son métricas distintas:
 
 | Tipo solicitado | Archivo | Evidencia verificable |
 | --- | --- | --- |
-| Flujo de trabajo | `.github/workflows/release.yml` | Eventos para `main`, trabajos `verificar` y `desplegar`, y dependencia `needs: verificar`. Ejecución de Actions: pendiente hasta subir el repositorio. |
+| Flujo de trabajo | `.github/workflows/release.yml` | Eventos para `main`, trabajos `verificar` y `desplegar`, y dependencia `needs: verificar`. [Ejecución #2, intento 2](https://github.com/davi8d280303/manejo-de-scripts/actions/runs/45101791254/attempts/2) correcta para el commit `83615a2`. |
 | Generación del entorno de liberación | `scripts/preparar.sh` | Crea `dist/` limpio y lista sus archivos. Ejecución local observada: correcta. |
 | Pruebas en el entorno de liberación | `scripts/probar.sh` | Inicia servidor HTTP, verifica tabla/horario/CSS y usa `trap` para cerrarlo. Sintaxis y caso exitoso: código `0`; copia sin CSS: código `1` esperado y mensaje de error específico. |
-| Generación del despliegue | `scripts/desplegar.sh` | Valida `dist/`; `upload-pages-artifact` y `deploy-pages` del workflow hacen la publicación remota. Sitio y URL: pendientes de configurar GitHub Pages. |
+| Generación del despliegue | `scripts/desplegar.sh` | Valida `dist/`; `upload-pages-artifact` y `deploy-pages` del workflow hacen la publicación remota. La ejecución correcta publicó el [sitio en GitHub Pages](https://davi8d280303.github.io/manejo-de-scripts/). |
 
-No se incluyen enlaces inventados: el repositorio no tiene remoto configurado y no existe todavía una ejecución de Actions ni un sitio publicado. Cuando se creen, agregar aquí la URL del repositorio, el enlace a la ejecución de Actions y la URL de GitHub Pages.
+Evidencia remota disponible: [repositorio de GitHub](https://github.com/davi8d280303/manejo-de-scripts), [ejecución exitosa de GitHub Actions (#2, intento 2)](https://github.com/davi8d280303/manejo-de-scripts/actions/runs/45101791254/attempts/2) y [sitio publicado en GitHub Pages](https://davi8d280303.github.io/manejo-de-scripts/). La ejecución publicada corresponde al commit `83615a2`.
 
 ## Registro de verificación local
 
@@ -80,4 +80,4 @@ DIST_DIR=/tmp/horarios-sin-css bash scripts/probar.sh
 bash scripts/probar.sh
 ```
 
-Sobre una copia temporal sin `assets/styles.css`, la prueba terminó con código `1` y mostró exactamente `Error de prueba: no existe el CSS referenciado: assets/styles.css`. El código `1` era el resultado esperado del caso de fallo controlado: demuestra que el script detecta que falta la hoja de estilos referenciada. Al finalizar se confirmó que `dist/index.html` y `dist/assets/styles.css` seguían presentes en la versión original. La evidencia de que una falla impide el despliegue está implementada de forma estática en `needs: verificar`; su observación remota queda pendiente hasta ejecutar Actions.
+Sobre una copia temporal sin `assets/styles.css`, la prueba terminó con código `1` y mostró exactamente `Error de prueba: no existe el CSS referenciado: assets/styles.css`. El código `1` era el resultado esperado del caso de fallo controlado: demuestra que el script detecta que falta la hoja de estilos referenciada. Al finalizar se confirmó que `dist/index.html` y `dist/assets/styles.css` seguían presentes en la versión original. Esta evidencia local es distinta de la ejecución remota: la [ejecución #2, intento 2](https://github.com/davi8d280303/manejo-de-scripts/actions/runs/45101791254/attempts/2) pasó las pruebas y publicó correctamente en GitHub Pages el commit `83615a2`. La dependencia `needs: verificar` impide que el trabajo de despliegue se ejecute si las pruebas fallan.
