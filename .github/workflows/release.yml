@@ -33,12 +33,15 @@ jobs:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     permissions:
+      contents: read
       pages: write
       id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
       - name: Recuperar versión que pasó las pruebas
         uses: actions/download-artifact@v4
         with:
