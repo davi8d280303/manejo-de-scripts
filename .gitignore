@@ -1,0 +1,6 @@
+# Versión candidata generada localmente; CI la crea y conserva como artefacto.
+dist/
+
+# Archivos temporales de las pruebas HTTP.
+horarios-*.html
+horarios-*.css

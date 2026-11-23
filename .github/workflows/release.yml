@@ -1,0 +1,57 @@
+name: Liberar y desplegar horarios
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  verificar:
+    name: Preparar y probar
+    runs-on: ubuntu-latest
+    steps:
+      - name: Obtener código
+        uses: actions/checkout@v4
+      - name: Preparar versión candidata
+        run: bash scripts/preparar.sh
+      - name: Probar versión candidata
+        run: bash scripts/probar.sh
+      - name: Conservar versión que pasó las pruebas
+        uses: actions/upload-artifact@v4
+        with:
+          name: sitio-verificado
+          path: dist
+          if-no-files-found: error
+
+  desplegar:
+    name: Publicar en GitHub Pages
+    needs: verificar
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Recuperar versión que pasó las pruebas
+        uses: actions/download-artifact@v4
+        with:
+          name: sitio-verificado
+          path: dist
+      - name: Validar contenido para publicación
+        run: bash scripts/desplegar.sh
+      - name: Configurar Pages
+        uses: actions/configure-pages@v5
+      - name: Subir artefacto probado
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - name: Desplegar artefacto remotamente
+        id: deployment
+        uses: actions/deploy-pages@v4

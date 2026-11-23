@@ -1,0 +1,9 @@
+:root { color-scheme: light; font-family: Arial, sans-serif; color: #172033; background: #f4f7fb; }
+body { margin: 0; }
+main { max-width: 760px; margin: 3rem auto; padding: 2rem; background: white; border-radius: 8px; box-shadow: 0 2px 10px #17203320; }
+h1 { color: #0b4f8a; }
+table { width: 100%; border-collapse: collapse; margin-top: 1.5rem; }
+caption { margin-bottom: .6rem; font-weight: bold; text-align: left; }
+th, td { padding: .8rem; border: 1px solid #b9c7d8; text-align: left; }
+th { background: #dcecf9; }
+tbody tr:nth-child(even) { background: #f5f9fd; }
